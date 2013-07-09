@@ -1,0 +1,4 @@
+/node_modules
+/lib/DefinitelyTyped
+/public/js/*.js
+*.map

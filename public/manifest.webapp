@@ -1,0 +1,23 @@
+{
+  "version": "0.1",
+  "name": "My Awesome App",
+  "description": "Your new awesome Open Web App",
+  "launch_path": "/index.html",
+  "icons": {
+    "128": "/img/icons/icon-128.png"
+  },
+  "developer": {
+    "name": "ぷろぐれ",
+    "url": "http://www.prgrssv.net"
+  },
+  "locales": {
+    "en": {
+      "description": "Your new awesome Open Web App",
+      "developer": {
+        "name": "progre"
+        "url": "http://www.prgrssv.net"
+      }
+    },
+  },
+  "default_locale": "ja"
+}
