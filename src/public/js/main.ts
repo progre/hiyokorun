@@ -1,6 +1,5 @@
 /// <reference path='../../../lib/DefinitelyTyped/easeljs/easeljs.d.ts'/>
 /// <reference path='../../../lib/EventEmitter.d.ts'/>
-/// <reference path='../../../lib/linq.d.ts'/>
 
 declare var stats;
 
