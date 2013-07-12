@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1">
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/lib/createjs-2013.05.14.min.js"></script>
+<script src="/js/lib/EventEmitter.min.js"></script>
+<script data-main="/js/main" src="/js/lib/require.js"></script>
+<div>
+	<canvas id="canvas" width=0 height=0></canvas>
+</div>
+<script src="https://raw.github.com/mrdoob/stats.js/master/build/stats.min.js"></script>
+<script>
+	var stats = new Stats();
+	stats.setMode(0); // 0: fps, 1: ms
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.left = '0px';
+	stats.domElement.style.top = '0px';
+	stats.domElement.style.width = '150px';
+	document.body.appendChild( stats.domElement );
+</script>
+<script src="http://localhost:35729/livereload.js"></script>
