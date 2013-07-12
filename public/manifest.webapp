@@ -1,10 +1,10 @@
 {
   "version": "0.1",
-  "name": "My Awesome App",
-  "description": "Your new awesome Open Web App",
+  "name": "hiyokorun",
+  "description": "かわいいひよこがレースをします",
   "launch_path": "/index.html",
   "icons": {
-    "128": "/img/icons/icon-128.png"
+    "60": "/img/icon.png"
   },
   "developer": {
     "name": "ぷろぐれ",
@@ -12,12 +12,12 @@
   },
   "locales": {
     "en": {
-      "description": "Your new awesome Open Web App",
+      "description": "Pretty hiyoko race!",
       "developer": {
-        "name": "progre"
+        "name": "progre",
         "url": "http://www.prgrssv.net"
       }
-    },
+    }
   },
   "default_locale": "ja"
 }

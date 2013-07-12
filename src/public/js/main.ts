@@ -1,4 +1,4 @@
-/// <reference path='../../../lib/DefinitelyTyped/easeljs/easeljs.d.ts'/>
+/// <reference path='../../../lib/easeljs/easeljs.d.ts'/>
 /// <reference path='../../../lib/EventEmitter.d.ts'/>
 
 declare var stats;
@@ -13,6 +13,7 @@ export module main {
         canvas = <HTMLCanvasElement>document.getElementById('canvas');
         stage = new createjs.Stage(canvas);
         resize();
+        stage.addChild();
         window.addEventListener('resize', resize);
         createjs.Ticker.setFPS(60);
         createjs.Ticker.addListener(() => {
@@ -22,6 +23,7 @@ export module main {
             stage.update();
             stats.end();
         });
+        initDraw();
     };
 
     function resize() {
@@ -36,5 +38,18 @@ export module main {
     }
 
     function draw() {
+
+    }
+
+    function initDraw() {
+        var brand = new createjs.Bitmap('img/brand.png');
+        brand.scaleX = 1000;
+        brand.scaleY = 1000;
+        brand.alpha = 0.0;
+        createjs.Tween.get(brand)
+            .to({ alpha: 1.0 }, 1000)
+            .wait(2000)
+            .to({ alpha: 0.0 }, 1000);
+        stage.addChild(brand);
     }
 }
