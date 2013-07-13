@@ -22,7 +22,6 @@ export module main {
         createjs.Ticker.addListener(() => {
             stats.begin();
             update();
-            draw();
             stage.update();
             stats.end();
         });
@@ -37,9 +36,6 @@ export module main {
     }
 
     function update() {
-    }
-
-    function draw() {
-        presenterObj.draw();
+        presenterObj.update();
     }
 }

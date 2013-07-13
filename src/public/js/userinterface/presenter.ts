@@ -1,14 +1,20 @@
+import Game = require('userinterface/game');
+
 export class Presenter {
     frame = -1;
     scene: createjs.DisplayObject;
     sceneType: SceneType = null;
+    game = new Game();
 
     constructor(private stage: createjs.Stage) {
     }
 
-    draw() {
+    update() {
         if (this.frame === -1) {
             this.changeScene(SceneType.BRAND);
+        }
+        if (this.sceneType === SceneType.GAME) {
+            this.game.update();
         }
     }
 
@@ -23,6 +29,9 @@ export class Presenter {
             case SceneType.TITLE:
                 this.scene = getTitleScene(this);
                 break;
+            case SceneType.GAME:
+                this.scene = this.game.container;
+                break;
         }
         this.frame = 0;
         this.sceneType = sceneType;
@@ -31,7 +40,7 @@ export class Presenter {
 }
 
 export enum SceneType {
-    BRAND, TITLE
+    BRAND, TITLE, GAME
 }
 
 
@@ -56,6 +65,9 @@ function getTitleScene(presenter: Presenter) {
     title.scaleY = 1000;
     title.alpha = 0.0;
     createjs.Tween.get(title)
-        .to({ alpha: 1.0 }, 250);
+        .to({ alpha: 1.0 }, 250)
+        .call(tweenObject => {
+            presenter.changeScene(SceneType.GAME);
+        });
     return title;
 }
