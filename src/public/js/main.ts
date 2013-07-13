@@ -1,5 +1,6 @@
 /// <reference path='../../../lib/easeljs/easeljs.d.ts'/>
 /// <reference path='../../../lib/EventEmitter.d.ts'/>
+/// <reference path='../../../lib/linq.d.ts'/>
 declare var stats;
 
 import presenter = require('userinterface/presenter');
