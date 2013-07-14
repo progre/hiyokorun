@@ -1,4 +1,5 @@
 import entity = require('domain/entity/entity');
+import hiyoko = require('domain/entity/hiyoko');
 
 export = Game;
 class Game {
@@ -44,7 +45,7 @@ class WorldView {
         entity.GroundFactory.create(0, 1000).forEach(x => {
             this.grounds.push(new GroundView(x));
         });
-        this.hiyokos = entity.HiyokoFactory.createNew()
+        this.hiyokos = hiyoko.HiyokoFactory.createNew()
             .map(x => new HiyokoView(x));
         this.hiyokos.forEach(
             x => this.container.addChild(x.animation));
@@ -53,18 +54,18 @@ class WorldView {
     update() {
         var groundModels = this.grounds.map(x => x.model);
         Enumerable.from(this.hiyokos)
-            .where(x => x.model.status.state !== entity.State.DEAD)
+            .where(x => x.model.status.state !== hiyoko.State.DEAD)
             .forEach(x => x.update(groundModels));
         this.pan();
     }
 
     isEnd() {
-        return this.hiyokos.every(x => x.model.status.state === entity.State.DEAD);
+        return this.hiyokos.every(x => x.model.status.state === hiyoko.State.DEAD);
     }
 
     getFastest() {
         return Enumerable.from(this.hiyokos)
-            .where(x => x.model.status.state !== entity.State.DEAD)
+            .where(x => x.model.status.state !== hiyoko.State.DEAD)
             .orderBy(x => -x.model.status.x)
             .firstOrDefault();
     }
@@ -105,9 +106,9 @@ function whiteWall() {
 
 class HiyokoView {
     animation: createjs.BitmapAnimation;
-    currentState = entity.State.WALK;
+    currentState = hiyoko.State.WALK;
 
-    constructor(public model: entity.Hiyoko) {
+    constructor(public model: hiyoko.Hiyoko) {
         var spriteSheet = {
             images: ['/img/hiyoco_nomal_full.png'],
             frames: { width: 32, height: 32 },
@@ -147,12 +148,12 @@ class GroundView {
     }
 }
 
-function toAnimationName(state: entity.State) {
+function toAnimationName(state: hiyoko.State) {
     switch (state) {
-        case entity.State.WALK: return 'walk';
-        case entity.State.CHARGE: return 'charge';
-        case entity.State.AIR: return 'air';
-        case entity.State.FALL: return 'fall';
+        case hiyoko.State.WALK: return 'walk';
+        case hiyoko.State.CHARGE: return 'charge';
+        case hiyoko.State.AIR: return 'air';
+        case hiyoko.State.FALL: return 'fall';
         default: return '';
     }
 }
