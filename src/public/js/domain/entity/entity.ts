@@ -161,7 +161,7 @@ export class GroundFactory {
             if (prev == null) {
                 next = new Ground(-100 * 1000, 320 * 1000, 0);
             } else {
-                var begin = prev.end + 32 * 1000 + randomRange(0, x);
+                var begin = prev.end + (32 + randomRange(0, x)) * 1000;
                 var end = begin + randomRange(64 * 1000, 200 * 1000);
                 var low = Math.max(-100, -x) * 1000;
                 var high = Math.min(x, 200) * 1000;

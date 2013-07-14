@@ -2,22 +2,39 @@ import entity = require('domain/entity/entity');
 
 export = Game;
 class Game {
-    container = new createjs.Container();
+    container = new createjs.Container(); // 320000 x 320000
     private worldView = new WorldView();
+    private meterText = new createjs.Text('1000m', '20px sans-serif', '#888');
 
     constructor() {
         this.container.addChild(whiteWall());
+        this.container.addChild(this.worldView.container);
+        this.container.addChild(this.meterText);
+        this.meterText.y = 300 * 1000;
+        this.meterText.scaleX = 1000;
+        this.meterText.scaleY = 1000;
+    }
+
+    createWorld() {
+        if (this.worldView !== null) {
+            this.container.removeChild(this.worldView.container);
+        }
+        this.worldView = new WorldView();
         this.container.addChild(this.worldView.container);
     }
 
     update() {
         this.worldView.update();
+        if (this.worldView.isEnd()) {
+            this.createWorld();
+        }
+        this.meterText.text = (this.worldView.center / 10000 | 0) + ' cm';
     }
 }
 
 class WorldView {
     container = new createjs.Container();
-    private center = 0;
+    center = 0;
     private hiyokos: HiyokoView[] = [];
     private grounds: GroundView[] = [];
 
@@ -42,32 +59,33 @@ class WorldView {
     }
 
     isEnd() {
+        return this.hiyokos.every(x => x.model.status.state === entity.State.DEAD);
     }
 
     getFastest() {
         return Enumerable.from(this.hiyokos)
+            .where(x => x.model.status.state !== entity.State.DEAD)
             .orderBy(x => -x.model.status.x)
-            .first();
+            .firstOrDefault();
     }
 
     pan() {
-        var firstest = this.getFastest().model.status.x;
+        var firstestHiyoko = this.getFastest();
+        if (firstestHiyoko == null)
+            return;
+        var firstest = firstestHiyoko.model.status.x;
         if (firstest < this.center)
             this.center -= (this.center - firstest) / 2;
         else if (firstest > this.center)
             this.center += (firstest - this.center) / 2;
         this.container.x = this.center + 160 * 1000;
 
-        //        this.container.removeAllChildren();
         this.grounds.forEach(x => {
             if (this.isVisible(x.model.begin, x.model.end))
                 this.container.addChild(x.shape);
             else
                 this.container.removeChild(x.shape);
         });
-        //        Enumerable.from(this.hiyokos)
-        //    .where(x => this.isVisible(x.model.status.x - 8, x.model.status.x + 8))
-        //    .forEach(x => this.container.addChild(x.animation));
     }
 
     isVisible(begin: number, end: number) {
@@ -96,7 +114,8 @@ class HiyokoView {
             animations: {
                 'walk': [2, 3, null, 8],
                 'charge': 1,
-                'air': 3
+                'air': 3,
+                'fall': 4
             }
         };
         var ss = new createjs.SpriteSheet(spriteSheet);
@@ -133,6 +152,7 @@ function toAnimationName(state: entity.State) {
         case entity.State.WALK: return 'walk';
         case entity.State.CHARGE: return 'charge';
         case entity.State.AIR: return 'air';
+        case entity.State.FALL: return 'fall';
         default: return '';
     }
 }
