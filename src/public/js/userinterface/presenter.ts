@@ -11,7 +11,7 @@ export class Presenter {
 
     update() {
         if (this.frame === -1) {
-            this.changeScene(SceneType.BRAND);
+            this.changeScene(SceneType.GAME);
         }
         if (this.sceneType === SceneType.GAME) {
             this.game.update();

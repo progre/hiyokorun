@@ -23,8 +23,9 @@ export module main {
         createjs.Ticker.addListener(() => {
             stats.begin();
             update();
-            stage.update();
             stats.end();
+            if (createjs.Ticker.getMeasuredFPS() >= 50)
+                stage.update();
         });
     };
 
