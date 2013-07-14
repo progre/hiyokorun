@@ -7,7 +7,7 @@ export class Hiyoko {
     status = new Status();
     private groundIndex = 0;
 
-    constructor(private potential: Potential) {
+    constructor(public potential: Potential) {
         this.status.life = potential.life;
     }
 
@@ -127,8 +127,8 @@ export class Potential {
     }
 }
 
-export module HiyokoFactory {
-    export function createNew() {
+export class HiyokoFactory {
+    static createNew() {
         return Enumerable.repeat(null, 20).select(x => {
             var hiyoko = new Hiyoko(new Potential(
                 utils.randomRange(2500, 3000),
@@ -143,4 +143,48 @@ export module HiyokoFactory {
             return hiyoko;
         }).toArray();
     }
+
+    static createNext(hiyokos: Hiyoko[]) {
+        return select(hiyokos)
+            .shuffle()
+            .buffer(2)
+            .select((x: Hiyoko[]) => crossover(x[0].potential, x[1].potential))
+            .selectMany(x => x, x => new Hiyoko(x))
+            .toArray();
+    }
+}
+
+function select(hiyokos: Hiyoko[]) {
+    // トーナメント形式で淘汰する
+    return Enumerable.from(hiyokos)
+        .shuffle()
+        .buffer(2)
+        .select((x: Hiyoko[]) => Enumerable.from(x)
+            .orderBy(y => y.status.x).first());
+}
+
+function crossover(p1: Potential, p2: Potential) {
+    var selector = Enumerable.generate(() => Math.random() >= 0.5, 8).toArray();
+    return [
+        new Potential(
+            selector[0] ? p1.speed : p2.speed,
+            selector[1] ? p1.chargeStartDistance : p2.chargeStartDistance,
+            selector[2] ? p1.chargeTime : p2.chargeTime,
+            selector[3] ? p1.chargeWeight : p2.chargeWeight,
+            selector[4] ? p1.jumpHeightWeight : p2.jumpHeightWeight,
+            selector[5] ? p1.jumpWidthWeight : p2.jumpWidthWeight,
+            selector[6] ? p1.life : p2.life,
+            selector[7] ? p1.recoveryPower : p2.recoveryPower
+            ),
+        new Potential(
+            !selector[0] ? p1.speed : p2.speed,
+            !selector[1] ? p1.chargeStartDistance : p2.chargeStartDistance,
+            !selector[2] ? p1.chargeTime : p2.chargeTime,
+            !selector[3] ? p1.chargeWeight : p2.chargeWeight,
+            !selector[4] ? p1.jumpHeightWeight : p2.jumpHeightWeight,
+            !selector[5] ? p1.jumpWidthWeight : p2.jumpWidthWeight,
+            !selector[6] ? p1.life : p2.life,
+            !selector[7] ? p1.recoveryPower : p2.recoveryPower
+            )
+    ];
 }

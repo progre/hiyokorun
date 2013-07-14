@@ -99,7 +99,7 @@ declare module linqjs {
         weightedSample(weightSelector: (element: T) => any): Enumerable;
         groupBy(keySelector: (element: T) => any, elementSelector?: (element: T) => any, resultSelector?: (key: any, element: T) => any, compareSelector?: (element: T) => any): Enumerable;
         partitionBy(keySelector: (element: T) => any, elementSelector?: (element: T) => any, resultSelector?: (key: any, element: T) => any, compareSelector?: (element: T) => any): Enumerable;
-        buffer(count: number): Enumerable;
+        buffer(count: number): Enumerable<any[]>;
         aggregate(func: (prev: T, current: T) => T): T;
         aggregate<TResult>(seed: T, func: (prev: T, current: T) => T, resultSelector?: (last: T) => TResult): TResult;
         average(selector?: (element: T) => any): number;
