@@ -4,31 +4,31 @@ import hiyoko = require('domain/entity/hiyoko');
 export = Game;
 class Game {
     container = new createjs.Container(); // 320000 x 320000
-    private worldView = new WorldView();
+    private world: entity.World;
+    private worldView: WorldView = new WorldView();
     private meterText = new createjs.Text('1000m', '20px sans-serif', '#888');
 
     constructor() {
         this.container.addChild(whiteWall());
         this.container.addChild(this.worldView.container);
         this.container.addChild(this.meterText);
+        this.createWorld();
         this.meterText.y = 300 * 1000;
         this.meterText.scaleX = 1000;
         this.meterText.scaleY = 1000;
     }
 
     createWorld() {
-        if (this.worldView !== null) {
-            this.container.removeChild(this.worldView.container);
-        }
-        this.worldView = new WorldView();
-        this.container.addChild(this.worldView.container);
+        this.world = entity.WorldFactory.createNew();
+        this.worldView.init(this.world);
     }
 
     update() {
-        this.worldView.update();
-        if (this.worldView.isEnd()) {
+        if (this.world.isEnd()) {
             this.createWorld();
         }
+        this.world.update();
+        this.worldView.update();
         this.meterText.text = (this.worldView.center / 10000 | 0) + ' cm';
     }
 }
@@ -36,31 +36,30 @@ class Game {
 class WorldView {
     container = new createjs.Container();
     center = 0;
+    private model: entity.World;
     private hiyokos: HiyokoView[] = [];
     private grounds: GroundView[] = [];
 
     constructor() {
         this.container.y = 200 * 1000;
+    }
 
-        entity.GroundFactory.create(0, 1000).forEach(x => {
-            this.grounds.push(new GroundView(x));
-        });
-        this.hiyokos = hiyoko.HiyokoFactory.createNew()
-            .map(x => new HiyokoView(x));
-        this.hiyokos.forEach(
-            x => this.container.addChild(x.animation));
+    init(model: entity.World) {
+        this.container.removeAllChildren();
+        this.center = 0;
+        this.model = model;
+        this.grounds = this.model.grounds.map(x => new GroundView(x));
+        this.hiyokos = this.model.hiyokos.map(x => new HiyokoView(x));
+        this.hiyokos.forEach(x =>
+            this.container.addChild(x.animation));
     }
 
     update() {
-        var groundModels = this.grounds.map(x => x.model);
         Enumerable.from(this.hiyokos)
             .where(x => x.model.status.state !== hiyoko.State.DEAD)
-            .forEach(x => x.update(groundModels));
+            .forEach(hiyoko =>
+                hiyoko.update());
         this.pan();
-    }
-
-    isEnd() {
-        return this.hiyokos.every(x => x.model.status.state === hiyoko.State.DEAD);
     }
 
     getFastest() {
@@ -126,8 +125,7 @@ class HiyokoView {
         this.animation.gotoAndPlay('walk');
     }
 
-    update(grounds: entity.Ground[]) {
-        this.model.update(grounds);
+    update() {
         if (this.currentState !== this.model.status.state) {
             this.currentState = this.model.status.state;
             this.animation.gotoAndPlay(toAnimationName(this.currentState));

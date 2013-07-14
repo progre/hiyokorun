@@ -25,7 +25,8 @@ export class Hiyoko {
             }
         }
         this.move();
-        this.hitProcess(grounds[this.groundIndex]);
+        if (grounds.length > this.groundIndex + 1)
+            this.hitProcess(grounds[this.groundIndex], grounds[this.groundIndex + 1]);
     }
 
     move() {
@@ -45,7 +46,7 @@ export class Hiyoko {
         }
     }
 
-    hitProcess(ground: entity.Ground) {
+    hitProcess(ground: entity.Ground, nextGround: entity.Ground) {
         switch (this.status.state) {
             case State.WALK:
                 var distanceToCliff = ground.end - this.status.x;
@@ -55,7 +56,8 @@ export class Hiyoko {
                 break;
             case State.CHARGE:
                 if (this.status.time >= this.potential.chargeTime) {
-                    this.jump();
+                    this.status.time = 0;
+                    this.jump(nextGround);
                     break;
                 }
                 this.status.time++;
@@ -82,19 +84,23 @@ export class Hiyoko {
         }
     }
 
-    jump() {
-        var jumpPower = Math.min(
-            this.potential.chargeWeight * this.potential.chargeTime,
-            this.potential.jumpHeightWeight * 1 * 1000//todo
-            + this.potential.jumpWidthWeight * 10 * 1000//todo
-            );
-        this.status.velocity = jumpPower;
+    jump(ground: entity.Ground) {
+        this.status.velocity = range(
+            GRAVITY + 1,
+            this.potential.jumpPower
+            + this.potential.jumpHeightWeight * (ground.height - this.status.y)
+            + this.potential.jumpWidthWeight * (ground.begin - this.status.x),
+            this.potential.chargeWeight * this.potential.chargeTime);
         this.status.state = State.AIR;
     }
 
     private on(ground: entity.Ground) {
         return ground.end > this.status.x + 8 && this.status.x - 8 >= ground.begin;
     }
+}
+
+function range(min: number, value: number, max: number) {
+    return Math.max(min, Math.min(value, max));
 }
 
 export class Status {
@@ -117,6 +123,7 @@ function isAir(state: State) {
 export class Potential {
     constructor(
         public speed: number,
+        public jumpPower: number,
         public chargeStartDistance: number,
         public chargeTime: number,
         public chargeWeight: number,
@@ -130,26 +137,19 @@ export class Potential {
 export class HiyokoFactory {
     static createNew() {
         return Enumerable.repeat(null, 20).select(x => {
-            var hiyoko = new Hiyoko(new Potential(
-                utils.randomRange(2500, 3000),
-                utils.randomRange(0, 100 * 1000),
-                utils.randomRange(0, 10),
-                utils.randomRange(0, 10000000000),
-                utils.randomRange(0, 1),
-                utils.randomRange(0, 1),
-                utils.randomRange(1, 100),
-                utils.randomRange(0, 100)))
-            hiyoko.status.x = utils.randomRange(-10 * 1000, 10 * 1000);
+            var hiyoko = new Hiyoko(createPotential());
+            hiyoko.status.x = utils.randomRange(-50 * 1000, 50 * 1000);
             return hiyoko;
         }).toArray();
     }
 
-    static createNext(hiyokos: Hiyoko[]) {
+    static createNext(hiyokos: Hiyoko[]): Hiyoko[] {
         return select(hiyokos)
             .shuffle()
             .buffer(2)
             .select((x: Hiyoko[]) => crossover(x[0].potential, x[1].potential))
-            .selectMany(x => x, x => new Hiyoko(x))
+            .selectMany(x => x)
+            .select(x => new Hiyoko(x))
             .toArray();
     }
 }
@@ -163,28 +163,46 @@ function select(hiyokos: Hiyoko[]) {
             .orderBy(y => y.status.x).first());
 }
 
+function createPotential() {
+    return new Potential(
+        utils.randomRange(2900, 3000),
+        utils.randomRange(0, 1000),
+        utils.randomRange(3 * 1000, 30 * 1000),
+        utils.randomRange(1, 2),
+        utils.randomRange(1, 10000),
+        utils.randomRange(0, 0.04 * 2),
+        utils.randomRange(0, 0.07 * 2),
+        utils.randomRange(1, 100),
+        utils.randomRange(0, 100));
+}
+
 function crossover(p1: Potential, p2: Potential) {
-    var selector = Enumerable.generate(() => Math.random() >= 0.5, 8).toArray();
+    if (Math.random() < 0.005) { // “Ë‘R•ÏˆÙ
+        p1 = createPotential();
+    }
+    var selector = Enumerable.generate(() => Math.random() >= 0.5, 9).toArray();
     return [
         new Potential(
             selector[0] ? p1.speed : p2.speed,
-            selector[1] ? p1.chargeStartDistance : p2.chargeStartDistance,
-            selector[2] ? p1.chargeTime : p2.chargeTime,
-            selector[3] ? p1.chargeWeight : p2.chargeWeight,
-            selector[4] ? p1.jumpHeightWeight : p2.jumpHeightWeight,
-            selector[5] ? p1.jumpWidthWeight : p2.jumpWidthWeight,
-            selector[6] ? p1.life : p2.life,
-            selector[7] ? p1.recoveryPower : p2.recoveryPower
+            selector[1] ? p1.jumpPower : p2.jumpPower,
+            selector[2] ? p1.chargeStartDistance : p2.chargeStartDistance,
+            selector[3] ? p1.chargeTime : p2.chargeTime,
+            selector[4] ? p1.chargeWeight : p2.chargeWeight,
+            selector[5] ? p1.jumpHeightWeight : p2.jumpHeightWeight,
+            selector[6] ? p1.jumpWidthWeight : p2.jumpWidthWeight,
+            selector[7] ? p1.life : p2.life,
+            selector[8] ? p1.recoveryPower : p2.recoveryPower
             ),
         new Potential(
             !selector[0] ? p1.speed : p2.speed,
-            !selector[1] ? p1.chargeStartDistance : p2.chargeStartDistance,
-            !selector[2] ? p1.chargeTime : p2.chargeTime,
-            !selector[3] ? p1.chargeWeight : p2.chargeWeight,
-            !selector[4] ? p1.jumpHeightWeight : p2.jumpHeightWeight,
-            !selector[5] ? p1.jumpWidthWeight : p2.jumpWidthWeight,
-            !selector[6] ? p1.life : p2.life,
-            !selector[7] ? p1.recoveryPower : p2.recoveryPower
+            !selector[1] ? p1.jumpPower : p2.jumpPower,
+            !selector[2] ? p1.chargeStartDistance : p2.chargeStartDistance,
+            !selector[3] ? p1.chargeTime : p2.chargeTime,
+            !selector[4] ? p1.chargeWeight : p2.chargeWeight,
+            !selector[5] ? p1.jumpHeightWeight : p2.jumpHeightWeight,
+            !selector[6] ? p1.jumpWidthWeight : p2.jumpWidthWeight,
+            !selector[7] ? p1.life : p2.life,
+            !selector[8] ? p1.recoveryPower : p2.recoveryPower
             )
     ];
 }

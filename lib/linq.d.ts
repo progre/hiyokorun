@@ -50,9 +50,12 @@ declare module linqjs {
         scan<TResult>(func: (prev: T, current: T) => TResult): Enumerable<TResult>;
         scan<TResult>(seed: T, func: (prev: T, current: T) => TResult): Enumerable<TResult>;
         select<TResult>(selector: (element: T, index: number) => TResult): Enumerable<TResult>;
-        selectMany<TResult>(collectionSelector: (element: T, index: number) => TResult[], resultSelector?: (outer: any, inner: any) => any): Enumerable<TResult>;
-        selectMany<TResult>(collectionSelector: (element: T, index: number) => Enumerable<TResult>, resultSelector?: (outer: any, inner: any) => any): Enumerable<TResult>;
-        selectMany<TResult>(collectionSelector: (element: T, index: number) => { length: number;[x: number]: TResult; }, resultSelector?: (outer: any, inner: any) => any): Enumerable<TResult>;
+        selectMany<TOther>(collectionSelector: (element: T, index: number) => Enumerable<TOther>): Enumerable<TOther>;
+        selectMany<TCollection, TResult>(collectionSelector: (element: T, index: number) => Enumerable<TCollection>, resultSelector: (outer: T, inner: TCollection) => TResult): Enumerable<TResult>;
+        selectMany<TOther>(collectionSelector: (element: T, index: number) => TOther[]): Enumerable<TOther>;
+        selectMany<TCollection, TResult>(collectionSelector: (element: T, index: number) => TCollection[], resultSelector: (outer: T, inner: TCollection) => TResult): Enumerable<TResult>;
+        selectMany<TOther>(collectionSelector: (element: T, index: number) => { length: number;[x: number]: TOther; }): Enumerable<TOther>;
+        selectMany<TCollection, TResult>(collectionSelector: (element: T, index: number) => { length: number;[x: number]: TCollection; }, resultSelector: (outer: T, inner: TCollection) => TResult): Enumerable<TResult>;
         where(predicate: (element: T, index: number) => boolean): Enumerable<T>;
         choose(selector: (element: any, index: number) => any): Enumerable;
         ofType(type: any): Enumerable<any>;

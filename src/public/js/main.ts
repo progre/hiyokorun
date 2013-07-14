@@ -24,8 +24,7 @@ export module main {
             stats.begin();
             update();
             stats.end();
-            if (createjs.Ticker.getMeasuredFPS() >= 50)
-                stage.update();
+            stage.update();
         });
     };
 
