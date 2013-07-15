@@ -145,9 +145,10 @@ export class HiyokoFactory {
 
     static createNext(hiyokos: Hiyoko[]) {
         var need = hiyokos.length;
-        return Enumerable.from(select(hiyokos))
-            .shuffle()
-            .concat(Enumerable.repeat(new Hiyoko(createPotential())))
+        var shuffled = Enumerable.from(select(hiyokos))
+            .shuffle();
+        return Enumerable.repeat(shuffled)
+            .selectMany(x => x)
             .buffer(2)
             .select((x: Hiyoko[]) => crossover(x[0].potential, x[1].potential))
             .selectMany(x => x)
@@ -165,7 +166,7 @@ function select(hiyokos: Hiyoko[]) {
     //    .select((x: Hiyoko[]) => Enumerable.from(x)
     //        .orderBy(y => y.status.x).first())
     //    .toArray();
-    // 順位付けで半分を淘汰する
+     //順位付けで半分を淘汰する
     return Enumerable.from(hiyokos)
         .orderByDescending(x => x.status.x)
         .take(hiyokos.length / 2 | 0)
@@ -186,7 +187,7 @@ function createPotential() {
 }
 
 function crossover(p1: Potential, p2: Potential) {
-    if (Math.random() < 0.005) { // 突然変異
+    if (Math.random() < 0.05) { // 突然変異
         p1 = createPotential();
     }
     var selector = Enumerable.generate(() => Math.random() >= 0.5, 9).toArray();
@@ -203,15 +204,15 @@ function crossover(p1: Potential, p2: Potential) {
             selector[8] ? p1.recoveryPower : p2.recoveryPower
             ),
         new Potential(
-            (!selector[0] ? p1.speed : p2.speed) + (Math.random() * 100 - 50 | 0),
-            !selector[1] ? p1.jumpPower : p2.jumpPower,
-            !selector[2] ? p1.chargeStartDistance : p2.chargeStartDistance,
-            !selector[3] ? p1.chargeTime : p2.chargeTime,
-            !selector[4] ? p1.chargeWeight : p2.chargeWeight,
-            !selector[5] ? p1.jumpHeightWeight : p2.jumpHeightWeight,
-            !selector[6] ? p1.jumpWidthWeight : p2.jumpWidthWeight,
-            !selector[7] ? p1.life : p2.life,
-            !selector[8] ? p1.recoveryPower : p2.recoveryPower
+            (p1.speed + p2.speed) / 2,
+            (p1.jumpPower + p2.jumpPower) / 2,
+            (p1.chargeStartDistance + p2.chargeStartDistance) / 2,
+            (p1.chargeTime + p2.chargeTime) / 2,
+            (p1.chargeWeight + p2.chargeWeight) / 2,
+            (p1.jumpHeightWeight + p2.jumpHeightWeight) / 2,
+            (p1.jumpWidthWeight + p2.jumpWidthWeight) / 2,
+            (p1.life + p2.life) / 2,
+            (p1.recoveryPower + p2.recoveryPower) / 2
             )
     ];
 }
