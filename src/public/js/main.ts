@@ -1,7 +1,6 @@
 /// <reference path='../../../lib/easeljs/easeljs.d.ts'/>
 /// <reference path='../../../lib/EventEmitter.d.ts'/>
 /// <reference path='../../../lib/linq.d.ts'/>
-declare var stats;
 
 import presenter = require('userinterface/presenter');
 
@@ -21,9 +20,7 @@ export module main {
         presenterObj = new presenter.Presenter(stage);
         createjs.Ticker.setFPS(60);
         createjs.Ticker.addListener(() => {
-            stats.begin();
             update();
-            stats.end();
             stage.update();
         });
     };

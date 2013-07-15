@@ -59,10 +59,10 @@ declare module linqjs {
         where(predicate: (element: T, index: number) => boolean): Enumerable<T>;
         choose(selector: (element: any, index: number) => any): Enumerable;
         ofType(type: any): Enumerable<any>;
-        zip<TSecond, TResult>(second: TSecond[], resultSelector: (first: T, second: TSecond, index: number) => TResult): Enumerable<TResult>;
-        zip<TSecond, TResult>(second: Enumerable<TSecond>, resultSelector: (first: T, second: TSecond, index: number) => TResult): Enumerable<TResult>;
-        zip<TSecond, TResult>(second: { length: number;[x: number]: TSecond; }, resultSelector: (first: T, second: TSecond, index: number) => TResult): Enumerable<TResult>;
-        zip(...params: any[]): Enumerable<any>; // last one is selector
+        zip<TResult>(second: Enumerable<T>, resultSelector: (first: T, second: T, index: number) => TResult): Enumerable<TResult>;
+        zip<TResult>(second: { length: number;[x: number]: T; }, resultSelector: (first: T, second: T, index: number) => TResult): Enumerable<TResult>;
+        zip<TResult>(second: T[], resultSelector: (first: T, second: T, index: number) => TResult): Enumerable<TResult>;
+        //zip<TResult>(...params: any[]): Enumerable<TResult>; // last one is selector
         merge(second: any[], resultSelector: (first: any, second: any, index: number) => any): Enumerable;
         merge(second: Enumerable<any>, resultSelector: (first: any, second: any, index: number) => any): Enumerable;
         merge(second: { length: number;[x: number]: any; }, resultSelector: (first: any, second: any, index: number) => any): Enumerable;

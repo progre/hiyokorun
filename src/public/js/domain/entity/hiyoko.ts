@@ -136,19 +136,23 @@ export class Potential {
 
 export class HiyokoFactory {
     static createNew() {
-        return Enumerable.repeat(null, 20).select(x => {
+        return Enumerable.repeat(null, 10).select(x => {
             var hiyoko = new Hiyoko(createPotential());
             hiyoko.status.x = utils.randomRange(-50 * 1000, 50 * 1000);
             return hiyoko;
         }).toArray();
     }
 
-    static createNext(hiyokos: Hiyoko[]): Hiyoko[] {
-        return select(hiyokos)
-            .shuffle()
+    static createNext(hiyokos: Hiyoko[]) {
+        var need = hiyokos.length;
+        return Enumerable.repeat(
+            Enumerable.from(select(hiyokos))
+                .shuffle())
+            .selectMany(x => x)
             .buffer(2)
             .select((x: Hiyoko[]) => crossover(x[0].potential, x[1].potential))
             .selectMany(x => x)
+            .take(need)
             .select(x => new Hiyoko(x))
             .toArray();
     }
@@ -156,11 +160,17 @@ export class HiyokoFactory {
 
 function select(hiyokos: Hiyoko[]) {
     // トーナメント形式で淘汰する
+    //return Enumerable.from(hiyokos)
+    //    .shuffle()
+    //    .buffer(2)
+    //    .select((x: Hiyoko[]) => Enumerable.from(x)
+    //        .orderBy(y => y.status.x).first())
+    //    .toArray();
+    // 順位付けで半分を淘汰する
     return Enumerable.from(hiyokos)
-        .shuffle()
-        .buffer(2)
-        .select((x: Hiyoko[]) => Enumerable.from(x)
-            .orderBy(y => y.status.x).first());
+        .orderByDescending(x => x.status.x)
+        .take(hiyokos.length / 2 | 0)
+        .toArray();
 }
 
 function createPotential() {
@@ -183,7 +193,7 @@ function crossover(p1: Potential, p2: Potential) {
     var selector = Enumerable.generate(() => Math.random() >= 0.5, 9).toArray();
     return [
         new Potential(
-            selector[0] ? p1.speed : p2.speed,
+            (selector[0] ? p1.speed : p2.speed) + (Math.random() * 100 | 0),
             selector[1] ? p1.jumpPower : p2.jumpPower,
             selector[2] ? p1.chargeStartDistance : p2.chargeStartDistance,
             selector[3] ? p1.chargeTime : p2.chargeTime,
@@ -194,7 +204,7 @@ function crossover(p1: Potential, p2: Potential) {
             selector[8] ? p1.recoveryPower : p2.recoveryPower
             ),
         new Potential(
-            !selector[0] ? p1.speed : p2.speed,
+            (!selector[0] ? p1.speed : p2.speed) + (Math.random() * 100 | 0),
             !selector[1] ? p1.jumpPower : p2.jumpPower,
             !selector[2] ? p1.chargeStartDistance : p2.chargeStartDistance,
             !selector[3] ? p1.chargeTime : p2.chargeTime,

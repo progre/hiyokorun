@@ -1,10 +1,11 @@
 {
   "version": "0.1",
-  "name": "hiyokorun",
-  "description": "かわいいひよこがレースをします",
+  "name": "chickens' race",
+  "description": "かわいいひよこを眺めるだけのアプリです",
   "launch_path": "/index.html",
   "icons": {
-    "60": "/img/icon.png"
+    "60": "/img/icon.png",
+    "128": "/img/icon-128.png"
   },
   "developer": {
     "name": "ぷろぐれ",
@@ -12,7 +13,7 @@
   },
   "locales": {
     "en": {
-      "description": "Pretty hiyoko race!",
+      "description": "You can look pretty chickens.",
       "developer": {
         "name": "progre",
         "url": "http://www.prgrssv.net"

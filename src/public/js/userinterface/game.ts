@@ -19,7 +19,11 @@ class Game {
     }
 
     createWorld() {
-        this.world = entity.WorldFactory.createNew();
+        if (this.world == null)
+            this.world = entity.WorldFactory.createNew();
+        else {
+            this.world = entity.WorldFactory.createNext(this.world);
+        }
         this.worldView.init(this.world);
     }
 
@@ -48,8 +52,8 @@ class WorldView {
         this.container.removeAllChildren();
         this.center = 0;
         this.model = model;
-        this.grounds = this.model.grounds.map(x => new GroundView(x));
-        this.hiyokos = this.model.hiyokos.map(x => new HiyokoView(x));
+        this.grounds = model.grounds.map(x => new GroundView(x));
+        this.hiyokos = model.hiyokos.map(x => new HiyokoView(x));
         this.hiyokos.forEach(x =>
             this.container.addChild(x.animation));
     }
@@ -123,6 +127,9 @@ class HiyokoView {
         this.animation.scaleX = 1000;
         this.animation.scaleY = 1000;
         this.animation.gotoAndPlay('walk');
+        this.animation.addEventListener('click', e => {
+            this.model.status.state = hiyoko.State.DEAD;
+        });
     }
 
     update() {

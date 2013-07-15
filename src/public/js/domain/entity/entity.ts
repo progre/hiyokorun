@@ -36,8 +36,12 @@ export class GroundFactory {
 export class World {
     grounds: Ground[];
 
-    constructor(public hiyokos: hiyoko.Hiyoko[]) {
+    constructor(public _hiyokos: hiyoko.Hiyoko[]) {
         this.grounds = GroundFactory.create(0, 1000);
+    }
+
+    get hiyokos() {
+        return this._hiyokos;
     }
 
     update() {
@@ -57,7 +61,7 @@ export class WorldFactory {
         return new World(hiyoko.HiyokoFactory.createNew());
     }
 
-    static createNext(world:World) {
+    static createNext(world: World) {
         return new World(hiyoko.HiyokoFactory.createNext(world.hiyokos));
     }
 }
