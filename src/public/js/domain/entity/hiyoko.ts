@@ -145,10 +145,9 @@ export class HiyokoFactory {
 
     static createNext(hiyokos: Hiyoko[]) {
         var need = hiyokos.length;
-        return Enumerable.repeat(
-            Enumerable.from(select(hiyokos))
-                .shuffle())
-            .selectMany(x => x)
+        return Enumerable.from(select(hiyokos))
+            .shuffle()
+            .concat(Enumerable.repeat(new Hiyoko(createPotential())))
             .buffer(2)
             .select((x: Hiyoko[]) => crossover(x[0].potential, x[1].potential))
             .selectMany(x => x)
@@ -193,7 +192,7 @@ function crossover(p1: Potential, p2: Potential) {
     var selector = Enumerable.generate(() => Math.random() >= 0.5, 9).toArray();
     return [
         new Potential(
-            (selector[0] ? p1.speed : p2.speed) + (Math.random() * 100 | 0),
+            (selector[0] ? p1.speed : p2.speed) + (Math.random() * 100 - 50 | 0),
             selector[1] ? p1.jumpPower : p2.jumpPower,
             selector[2] ? p1.chargeStartDistance : p2.chargeStartDistance,
             selector[3] ? p1.chargeTime : p2.chargeTime,
@@ -204,7 +203,7 @@ function crossover(p1: Potential, p2: Potential) {
             selector[8] ? p1.recoveryPower : p2.recoveryPower
             ),
         new Potential(
-            (!selector[0] ? p1.speed : p2.speed) + (Math.random() * 100 | 0),
+            (!selector[0] ? p1.speed : p2.speed) + (Math.random() * 100 - 50 | 0),
             !selector[1] ? p1.jumpPower : p2.jumpPower,
             !selector[2] ? p1.chargeStartDistance : p2.chargeStartDistance,
             !selector[3] ? p1.chargeTime : p2.chargeTime,

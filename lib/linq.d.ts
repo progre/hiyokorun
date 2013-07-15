@@ -72,6 +72,8 @@ declare module linqjs {
         all(predicate: (element: T) => boolean): boolean;
         any(predicate?: (element: T) => boolean): boolean;
         isEmpty(): boolean;
+        concat(...sequences: Enumerable<T>[]): Enumerable<T>;
+        concat(...sequences: { length: number;[x: number]: T; }[]): Enumerable<T>;
         concat(...sequences: T[]): Enumerable<T>;
         insert(index: number, second: any[]): Enumerable<any>;
         insert(index: number, second: Enumerable<any>): Enumerable<any>;
