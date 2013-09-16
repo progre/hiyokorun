@@ -4,36 +4,40 @@
 
 import presenter = require('userinterface/presenter');
 
+var WIDTH = 320 * 1000;
+var HEIGHT = WIDTH;
+
 export module main {
+    window.addEventListener('load', () => {
+        var mainObj = new Main(<HTMLCanvasElement>document.getElementById('canvas'));
+        window.addEventListener('resize', () => mainObj.resize());
+        mainObj.start();
+    });
+}
 
-    var WIDTH = 320 * 1000;
-    var HEIGHT = WIDTH;
-    var canvas: HTMLCanvasElement;
-    var stage: createjs.Stage;
-    var presenterObj: presenter.Presenter;
+class Main {
+    private stage: createjs.Stage;
+    private presenterObj: presenter.Presenter;
 
-    window.onload = function () {
-        canvas = <HTMLCanvasElement>document.getElementById('canvas');
-        stage = new createjs.Stage(canvas);
-        resize();
-        window.addEventListener('resize', resize);
-        presenterObj = new presenter.Presenter(stage);
-        createjs.Ticker.setFPS(60);
-        createjs.Ticker.addListener(() => {
-            update();
-            stage.update();
-        });
-    };
-
-    function resize() {
-        var size = Math.min(window.innerWidth, window.innerHeight);
-        canvas.width = size;
-        canvas.height = size;
-        stage.scaleX = size / WIDTH;
-        stage.scaleY = size / HEIGHT;
+    constructor(private canvas: HTMLCanvasElement) {
+        this.stage = new createjs.Stage(this.canvas);
+        this.resize();
+        this.presenterObj = new presenter.Presenter(this.stage);
     }
 
-    function update() {
-        presenterObj.update();
+    resize() {
+        var size = Math.min(window.innerWidth, window.innerHeight);
+        this.canvas.width = size;
+        this.canvas.height = size;
+        this.stage.scaleX = size / WIDTH;
+        this.stage.scaleY = size / HEIGHT;
+    }
+
+    start() {
+        createjs.Ticker.setFPS(60);
+        createjs.Ticker.addListener(() => {
+            this.presenterObj.update();
+            this.stage.update();
+        });
     }
 }
